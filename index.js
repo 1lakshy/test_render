@@ -1,13 +1,24 @@
 const express = require('express');
 const puppeteer = require('puppeteer');
-
+require("dotenv").config();
 const app = express();
 const PORT = process.env.PORT || 3000;
 
 app.get('/get-title', async (req, res) => {
   try {
     // Launch the browser
-    const browser = await puppeteer.launch();
+    const browser = await puppeteer.launch({
+      args: [
+        "--disable-setuid-sandbox",
+        "--no-sandbox",
+        "--single-process",
+        "--no-zygote",
+      ],
+      executablePath:
+        process.env.NODE_ENV === "production"
+          ? process.env.PUPPETEER_EXECUTABLE_PATH
+          : puppeteer.executablePath(),
+    });
     // Open a new page
     const page = await browser.newPage();
     // Go to google.com
